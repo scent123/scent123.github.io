@@ -33,6 +33,7 @@
   }
   
   #about .content .box_1 .photo {
+    display: block;
     width: 210px;
     height: 210px;
     margin-left: 28px;
