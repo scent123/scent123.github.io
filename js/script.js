@@ -16,7 +16,7 @@ $(document).ready(function () {
     } else if ($(this).closest("article").attr("id") == "project") {
       $("#keynote").removeClass("dot");
       setTimeout(function () {
-        $("#project>.content>.box_1>.pro_view>li").siblings().css('display', 'none');
+        // $("#project>.content>.box_1>.pro_view>li").siblings().css('display', 'none');
       }, 400)
     } else if ($(this).closest("article").attr("id") == "uiux") {
       $("#finder").removeClass("dot");
@@ -163,7 +163,7 @@ $(document).ready(function () {
 
   });
 
-  // 프로젝트
+  // 프로젝트 
   $("#project>.content>.box_1>.pro_list>li").click(function () {
     var pro_num = $(this).index() + 1;
     console.log(pro_num);
@@ -171,14 +171,38 @@ $(document).ready(function () {
     $("#project>.content>.box_1>.pro_view>li:nth-child(" + pro_num + ")").siblings().css('display', 'none');
     switch (pro_num) {
       case 1:
-        $(".box_2>h2").text("프로젝트 이름_1");
-        break
+        $(".box_2>h2").text("Ando Tadao");
+        $(".box_2>.name_list>li:first-child").text("일본의 한 건축가 ‘안도 다다오’의 작품에 대해 소개하는 사이트");
+        $(".box_2>.name_list>.day>li:first-child").text("프로젝트 시작일:");
+        $(".box_2>.name_list>.day>li:nth-child(2)").text("2023.09.13");
+        $(".box_2>.name_list>.day>li:nth-child(3)").text("프로젝트 종료일:");
+        $(".box_2>.name_list>.day>li:nth-child(4)").text("2023.12.02");
+        $(".box_2>.name_list>.day>li:nth-child(5)").text("규격:");
+        $(".box_2>.name_list>.day>li:last-child").text("1920x1080");
+        $(".box_2>.name_list>li:last-child").text("고정형 웹 형태로 제작");
+        break;
       case 2:
-        $(".box_2>h2").text("프로젝트 이름_2");
-        break
+        $(".box_2>h2").text("project 2's name");
+        $(".box_2>.name_list>li:first-child").text("--");
+        $(".box_2>.name_list>.day>li:first-child").text("프로젝트 시작일:");
+        $(".box_2>.name_list>.day>li:nth-child(2)").text("--");
+        $(".box_2>.name_list>.day>li:nth-child(3)").text("프로젝트 종료일:");
+        $(".box_2>.name_list>.day>li:nth-child(4)").text("--");
+        $(".box_2>.name_list>.day>li:nth-child(5)").text("규격:");
+        $(".box_2>.name_list>.day>li:last-child").text("--");
+        $(".box_2>.name_list>li:last-child").text("--");
+        break;
       case 3:
-        $(".box_2>h2").text("프로젝트 이름_3");
-        break
+        $(".box_2>h2").text("project 3' name");
+        $(".box_2>.name_list>li:first-child").text("--");
+        $(".box_2>.name_list>.day>li:first-child").text("프로젝트 시작일:");
+        $(".box_2>.name_list>.day>li:nth-child(2)").text("--");
+        $(".box_2>.name_list>.day>li:nth-child(3)").text("프로젝트 종료일:");
+        $(".box_2>.name_list>.day>li:nth-child(4)").text("--");
+        $(".box_2>.name_list>.day>li:nth-child(5)").text("규격:");
+        $(".box_2>.name_list>.day>li:last-child").text("--");
+        $(".box_2>.name_list>li:last-child").text("--");
+        break;
     }
   })
 
