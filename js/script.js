@@ -182,15 +182,15 @@ $(document).ready(function () {
         $(".box_2>.name_list>li:last-child").text("고정형 웹 형태로 제작");
         break;
       case 2:
-        $(".box_2>h2").text("project 2's name");
-        $(".box_2>.name_list>li:first-child").text("--");
+        $(".box_2>h2").text("ANGELINUS");
+        $(".box_2>.name_list>li:first-child").text("엔제리너스 카페의 홈페이지를 리뉴얼");
         $(".box_2>.name_list>.day>li:first-child").text("프로젝트 시작일:");
-        $(".box_2>.name_list>.day>li:nth-child(2)").text("--");
+        $(".box_2>.name_list>.day>li:nth-child(2)").text("2024.02.15");
         $(".box_2>.name_list>.day>li:nth-child(3)").text("프로젝트 종료일:");
-        $(".box_2>.name_list>.day>li:nth-child(4)").text("--");
+        $(".box_2>.name_list>.day>li:nth-child(4)").text("2024.03.10");
         $(".box_2>.name_list>.day>li:nth-child(5)").text("규격:");
-        $(".box_2>.name_list>.day>li:last-child").text("--");
-        $(".box_2>.name_list>li:last-child").text("--");
+        $(".box_2>.name_list>.day>li:last-child").text("1920x1080");
+        $(".box_2>.name_list>li:last-child").text("고정형 웹 형태로 제작");
         break;
       case 3:
         $(".box_2>h2").text("project 3' name");
