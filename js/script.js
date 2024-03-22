@@ -205,7 +205,7 @@ $(document).ready(function () {
         $(".box_2>.name_list>.day>li:last-child").text("1920x1080");
         $(".box_2>.name_list>li:last-child").text("반응형 웹 형태로 제작");
         // 이동 주소 변경하기
-        $(".box_2>a").attr("href", "http://naver.com");
+        $(".box_2>a").attr("href", "./musign/index.html");
         break;
     }
   })
