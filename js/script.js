@@ -180,7 +180,8 @@ $(document).ready(function () {
         $(".box_2>.name_list>.day>li:nth-child(5)").text("규격:");
         $(".box_2>.name_list>.day>li:last-child").text("1920x1080");
         $(".box_2>.name_list>li:last-child").text("고정형 웹 형태로 제작");
-        $(".box_2>a").attr("href", "./andotadao/index.html");
+        // 이동 주소 변경하기
+        $(".box_2>a").attr("href", "http://google.co.kr");
         break;
       case 2:
         $(".box_2>h2").text("ANGELINUS");
@@ -192,7 +193,6 @@ $(document).ready(function () {
         $(".box_2>.name_list>.day>li:nth-child(5)").text("규격:");
         $(".box_2>.name_list>.day>li:last-child").text("1920x1080");
         $(".box_2>.name_list>li:last-child").text("고정형 웹 형태로 제작");
-        $(".box_2>a").attr("href", "./angelinus/index.html");
         break;
       case 3:
         $(".box_2>h2").text("Musign");
@@ -205,7 +205,7 @@ $(document).ready(function () {
         $(".box_2>.name_list>.day>li:last-child").text("1920x1080");
         $(".box_2>.name_list>li:last-child").text("반응형 웹 형태로 제작");
         // 이동 주소 변경하기
-        $(".box_2>a").attr("href", "./musign/index.html");
+        $(".box_2>a").attr("href", "http://naver.com");
         break;
     }
   })
