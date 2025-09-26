@@ -82,6 +82,10 @@
   background-image: url("../images/musign.jpg");
 }
 
+#project>.content>.box_1>.pro_view>li>.view_4 {
+  background-image: url("../images/monami.jpg");
+}
+
 #project>.content>.box_1>.pro_list {
   width: 100%;
   height: 83px;
@@ -128,6 +132,10 @@
 
 #project>.content>.box_1>.pro_list>li>.img_3 {
   background-image: url("../images/musign.jpg");
+}
+
+#project>.content>.box_1>.pro_list>li>.img_4 {
+  background-image: url("../images/monami.jpg");
 }
 
 #project>.content>.box_2 {

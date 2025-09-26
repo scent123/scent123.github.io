@@ -181,7 +181,7 @@ $(document).ready(function () {
         $(".box_2>.name_list>.day>li:last-child").text("1920x1080");
         $(".box_2>.name_list>li:last-child").text("고정형 웹 형태로 제작");
         // 이동 주소 변경하기
-        $(".box_2>a").attr("href", "http://google.co.kr");
+        $(".box_2>a").attr("href", "./andotadao/index.html");
         break;
       case 2:
         $(".box_2>h2").text("ANGELINUS");
@@ -193,6 +193,8 @@ $(document).ready(function () {
         $(".box_2>.name_list>.day>li:nth-child(5)").text("규격:");
         $(".box_2>.name_list>.day>li:last-child").text("1920x1080");
         $(".box_2>.name_list>li:last-child").text("고정형 웹 형태로 제작");
+        // 이동 주소 변경하기
+        $(".box_2>a").attr("href", "./angelinus/index.html");
         break;
       case 3:
         $(".box_2>h2").text("Musign");
@@ -205,7 +207,20 @@ $(document).ready(function () {
         $(".box_2>.name_list>.day>li:last-child").text("1920x1080");
         $(".box_2>.name_list>li:last-child").text("반응형 웹 형태로 제작");
         // 이동 주소 변경하기
-        $(".box_2>a").attr("href", "http://naver.com");
+        $(".box_2>a").attr("href", "./musign/index.html");
+        break;
+      case 4:
+        $(".box_2>h2").text("Monami");
+        $(".box_2>.name_list>li:first-child").text("모나미 홈페이지 리뉴얼");
+        $(".box_2>.name_list>.day>li:first-child").text("프로젝트 시작일:");
+        $(".box_2>.name_list>.day>li:nth-child(2)").text("2025.7.22");
+        $(".box_2>.name_list>.day>li:nth-child(3)").text("프로젝트 종료일:");
+        $(".box_2>.name_list>.day>li:nth-child(4)").text("2024.09.13");
+        $(".box_2>.name_list>.day>li:nth-child(5)").text("규격:");
+        $(".box_2>.name_list>.day>li:last-child").text("1920x1080");
+        $(".box_2>.name_list>li:last-child").text("고정형 웹 형태로 제작");
+        // 이동 주소 변경하기
+        $(".box_2>a").attr("href", "./monami/index.html");
         break;
     }
   })
