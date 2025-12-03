@@ -222,6 +222,19 @@ $(document).ready(function () {
         // 이동 주소 변경하기
         $(".box_2>a").attr("href", "./monami/index.html");
         break;
+      case 5:
+        $(".box_2>h2").text("PortFolio");
+        $(".box_2>.name_list>li:first-child").text("현재 포트폴리오 페이지 리뉴얼");
+        $(".box_2>.name_list>.day>li:first-child").text("프로젝트 시작일:");
+        $(".box_2>.name_list>.day>li:nth-child(2)").text("2025.10.12");
+        $(".box_2>.name_list>.day>li:nth-child(3)").text("프로젝트 종료일:");
+        $(".box_2>.name_list>.day>li:nth-child(4)").text("제작중");
+        $(".box_2>.name_list>.day>li:nth-child(5)").text("규격:");
+        $(".box_2>.name_list>.day>li:last-child").text("1920x1080");
+        $(".box_2>.name_list>li:last-child").text("반응형 웹 형태로 제작");
+        // 이동 주소 변경하기
+        $(".box_2>a").attr("href", "./portfolio_re/index.html");
+        break;
     }
   })
 
