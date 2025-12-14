@@ -48,7 +48,7 @@ export function initFinder() {
                                 folderImage: "./images/Design.png",
                                 children: [
                                     { name: "여행사 홈페이지", type: "preview", image: './images/design/trip_web.jpg', explain: '두바이의 여행상품을 소개하는 홈페이지를 일러스트/포토샵으로 제작' },
-                                    { name: "아이폰 웹 페이지", type: "preview", image: './images/design/iphone_web.jpg', explain: '아이폰 소개 페이지를 일러스트/포토샵으로 제작' },
+                                    { name: "아이폰 웹 페이지", type: "preview", image: './images/design/iPhone_web.jpg', explain: '아이폰 소개 페이지를 일러스트/포토샵으로 제작' },
                                     { name: "엔제리너스 웹 페이지", type: "preview", image: './images/design/angelinus_main.jpg', explain: '엔제리너스 웹 페이지 레이아웃 디자인 작업' },
                                     { name: "일러스트 배너 1", type: "preview", image: './images/design/illust_banner1.jpg', explain: '웹 배너를 일러스트로 제작' },
                                     { name: "일러스트 배너 2", type: "preview", image: './images/design/illust_banner2.jpg', explain: '웹 배너를 일러스트로 제작' },
