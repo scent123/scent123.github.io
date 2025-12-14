@@ -1118,7 +1118,7 @@ main {
 
 .menu-icon {
     width: 2em;
-    height: 2rem;
+    /* height: 2rem; */
     margin-right: 0.5rem;
 }
 
