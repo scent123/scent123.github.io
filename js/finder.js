@@ -30,7 +30,7 @@ export function initFinder() {
                                 myName: "Kim Seon Jin",
                                 certificate: "1종보통면허, 컴퓨터그래픽스운용기능사, 웹디자인기능사",
                                 email: "ydsmj4571@gmail.com",
-                                number: "010-3367-4571",
+                                // number: "010-3367-4571",
                                 skills: [
                                     { name: "HTML / CSS", level: "웹 페이지 구조와 스타일링 기본 원리를 이해하고 있으며, 반응형 레이아웃 구성과 웹 표준·접근성 기초를 바탕으로 간단한 웹 UI를 제작할 수 있습니다." },
                                     { name: "JavaScript / jQuery", level: "DOM 조작, 이벤트 처리 등 웹 동작의 핵심 개념을 익혔습니다. JavaScript로 기본적인 인터랙션 구현이 가능하며, jQuery를 활용한 UI 효과 및 동적 요소 처리 경혐이 있습니다." },
@@ -68,10 +68,10 @@ export function initFinder() {
                                 name: "Projects",
                                 folderImage: "./images/Projects.png",
                                 children: [
-                                    { name: "Ando Tadao", type: "preview", image: "./images/Ando_Page.jpg", explain: '일본의 한 건축가 ‘안도 다다오’의 작품에 대해 소개하는 사이트를 자체 제작', timeline: '2023.09.13 - 2023.12.02', link: './andotadao/index.html' },
-                                    { name: "Angelinus", type: "preview", image: "./images/angelinus.jpg", explain: '엔제리너스 카페의 홈페이지를 리뉴얼하여 제작', timeline: '2024.02.15 - 2024.03.10', link: './angelinus/index.html' },
-                                    { name: "Musign", type: "preview", image: "./images/musign.jpg", explain: '인터넷 강의를 들으며 제작한 반응형 웹 뮤자인 홈페이지 제작', timeline: '2023-12.17 - 2024.01.22', link: './musign/index.html' },
-                                    { name: "Monami", type: "preview", image: "./images/monami.jpg", explain: '모나미 홈페이지를 리뉴얼하여 제작', timeline: '2025.07.22 - 2025.09.13', link: './monami/index.html' },
+                                    { name: "Ando Tadao", type: "preview", image: "./images/Ando_Page.jpg", skill: 'HTML, CSS, JavaScript, jQuery', explain: '일본의 한 건축가 ‘안도 다다오’의 작품에 대해 소개하는 사이트를 자체 제작', timeline: '2023.09.13 - 2023.12.02', link: './andotadao/index.html' },
+                                    { name: "Angelinus", type: "preview", image: "./images/angelinus.jpg", skill: 'HTML, CSS, JavaScript, jQuery', explain: '엔제리너스 카페의 홈페이지를 리뉴얼하여 제작', timeline: '2024.02.15 - 2024.03.10', link: './angelinus/index.html' },
+                                    { name: "Musign", type: "preview", image: "./images/musign.jpg", skill: 'HTML, CSS, JavaScript', explain: '인터넷 강의를 들으며 제작한 반응형 웹 뮤자인 홈페이지 제작', timeline: '2023-12.17 - 2024.01.22', link: './musign/index.html' },
+                                    { name: "Monami", type: "preview", image: "./images/monami.jpg", skill: 'HTML, CSS, JavaScript', explain: '모나미 홈페이지를 리뉴얼하여 제작', timeline: '2025.07.22 - 2025.09.13', link: './monami/index.html' },
                                 ],
                             },
 
@@ -112,17 +112,17 @@ export function initFinder() {
         });
     }
 
-    function callOpenApp(appName, path = null) {
-        if (window.WindowControls?.openApp) {
-            window.WindowControls.openApp(appName, { path });
-        }
-    }
+    // function callOpenApp(appName, path = null) {
+    //     if (window.WindowControls?.openApp) {
+    //         window.WindowControls.openApp(appName, { path });
+    //     }
+    // }
 
-    function callActivateDock(appName) {
-        if (window.WindowControls?.setActiveDockIcon) {
-            window.WindowControls.setActiveDockIcon(appName);
-        }
-    }
+    // function callActivateDock(appName) {
+    //     if (window.WindowControls?.setActiveDockIcon) {
+    //         window.WindowControls.setActiveDockIcon(appName);
+    //     }
+    // }
 
     /* Finder tree 탐색 */
     function getNodeByPath(path) {
@@ -136,10 +136,9 @@ export function initFinder() {
         return node;
     }
 
-
-    /* ----------------------------------------------------------
-     * openPath — preview 분기 포함, scroll 복구
-     * ---------------------------------------------------------- */
+    /* ============================================================
+     * Column
+     * ============================================================ */
     function openPath(path = []) {
 
         const folderNameEl = finderWindow.querySelector('.folder-name');
@@ -153,7 +152,7 @@ export function initFinder() {
             return;
         }
 
-        window.Finder.currentPath = path;
+        finderWindow.currentPath = path;
 
         const currentNode = getNodeByPath(path);
         const currentName = path[path.length - 1];
@@ -186,17 +185,34 @@ export function initFinder() {
             renderPreview(lastNode, path.length, path);
         }
 
-        // 오른쪽으로 자동 스크롤
         setTimeout(() => {
             content.scrollLeft = content.scrollWidth;
         }, 0);
 
+        // const firstItem = content.querySelector('.folder');
+
+        setTimeout(() => {
+            const columns = content.querySelectorAll('.finder-columns');
+            const lastColumn = columns[columns.length - 1];
+
+            if (lastColumn) {
+                const firstItem = lastColumn.querySelector('.folder');
+                if (firstItem) firstItem.focus();
+            }
+
+            const preview = content.querySelector('.finder-preview');
+            if (preview) {
+                const previewFocusTarget = preview.querySelector('.preview-image-btn, preview-closeBtn');
+                if (previewFocusTarget) previewFocusTarget.focus();
+            }
+
+            content.scrollLeft = content.scrollWidth;
+        }, 10);
     }
 
-
-    /* ----------------------------------------------------------
+    /* ============================================================
      * Column
-     * ---------------------------------------------------------- */
+     * ============================================================ */
     function renderColumn(items, level, selectedName, pathPrefix) {
 
         Array.from(content.children).forEach((child, idx) => {
@@ -205,28 +221,47 @@ export function initFinder() {
 
         const ul = document.createElement('ul');
         ul.classList.add('finder-columns');
+        ul.setAttribute('role', 'tree');
+        ul.setAttribute('aria-label', `${pathPrefix[pathPrefix.length - 1] || 'Root'} 폴더 내용`);
 
         const isMobile = window.innerWidth <= 768;
 
         // 모바일 Back 버튼
         if (pathPrefix.length >= 1 && isMobile) {
             const backLi = document.createElement('li');
-            backLi.classList.add('folder', 'back-item');
+            backLi.className = 'folder back-item';
+            backLi.setAttribute('role', 'treeitem');
+            backLi.setAttribute('tabindex', '0');
+            backLi.setAttribute('aria-label', 'Back');
             backLi.innerHTML = `
-                        <img src="./images/folder.png" class="list-picture">
+                        <img src="./images/folder.png" alt="" class="list-picture">
                         <span>...</span>
                     `;
-            backLi.addEventListener('click', () => {
+            const backButton = () => {
                 const parentPath = pathPrefix.slice(0, -1);
-                if (pathPrefix.length === 1 && pathPrefix[0] === 'Users') openPath([]);
-                else openPath(parentPath);
-            });
+                openPath(pathPrefix[0] === 'Users' && pathPrefix.length === 1 ? [] : parentPath);
+            };
+            backLi.addEventListener('click', backButton);
+            backLi.addEventListener('keydown', (e) => { if (e.key === 'Enter') backButton(); });
             ul.appendChild(backLi);
         }
 
         items.forEach(item => {
             const li = document.createElement('li');
             li.classList.add('folder');
+            li.setAttribute('role', 'treeitem');
+            li.setAttribute('tabindex', '0');
+
+            const isSelected = selectedName === item.name;
+
+            if (isSelected) {
+                li.classList.add('selected');
+                li.setAttribute('aria-selected', 'true');
+            }
+
+            if (item.children) {
+                li.setAttribute('aria-expanded', isSelected ? 'true' : 'false');
+            }
 
             const iconSrc =
                 item.folderImage ||
@@ -236,38 +271,29 @@ export function initFinder() {
                     : "./images/folder.png");
 
             li.innerHTML = `
-                <img src="${iconSrc}" class="list-picture">
-                <span>${item.name}</span>
-                <div class="column-arrow"> &gt; </div>
+                <img src="${iconSrc}" class="list-picture" alt="${item.name}">
+                <span class="item-name">${item.name}</span>
+                <div class="column-arrow" aria-hidden="true"> &gt; </div>
             `;
 
-            // 선택 강조
             if (selectedName === item.name && !isMobile) li.classList.add('selected');
 
-            /* -----------------------------------------
-             * ★ 수정됨: Finder 내부에서 App을 클릭하면
-             *   직접 창을 조작하지 않고 AppCore.openApp 로 통합
-             * ----------------------------------------- */
-            li.addEventListener('click', (e) => {
+            const handleAction = (e) => {
                 e.stopPropagation();
-
                 const newPath = [...pathPrefix, item.name];
-
                 if (item.type === 'App') {
-
-                    const appName = item.name.toLowerCase();
-
-                    // Finder가 스스로 자기창을 건드리지 않도록 AppCore에 위임
-                    callOpenApp(appName);
-
-                    // Dock active
-                    callActivateDock(appName);
-
-                    return;
+                    window.WindowControls?.openApp(item.name.toLowerCase());
+                } else {
+                    openPath(newPath);
                 }
+            };
 
-                // 폴더 탐색
-                openPath(newPath);
+            li.addEventListener('click', handleAction);
+            li.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleAction(e);
+                }
             });
 
             ul.appendChild(li);
@@ -276,11 +302,10 @@ export function initFinder() {
         content.appendChild(ul);
     }
 
-    /* ----------------------------------------------------------
+    /* ============================================================
      * Preview (분기별 property 렌더링)
-     * ---------------------------------------------------------- */
+     * ============================================================ */
     function renderPreview(item, level, path = []) {
-
         Array.from(content.children).forEach((child, idx) => {
             if (idx >= level) child.remove();
         });
@@ -289,9 +314,8 @@ export function initFinder() {
         let propertyHTML = "";
 
         if (item.name === "Profile") {
-            initSkillTooltip();
-            const skillsHTML = item.skills.map(skill => `
-                <span class='skill-item' data-level="${skill.level}">
+            const skillsHTML = item.skills.map((skill, i) => `
+                <span class='skill-item' id="skill-${i}" role="button" tabindex="0" data-level="${skill.level}" aria-label="${skill.name} 상세 정보">
                     ${skill.name}
                 </span>
                 `)
@@ -301,7 +325,6 @@ export function initFinder() {
                 <div class="property"><div class="key">Name</div><div class="value">${item.myName}</div></div>
                 <div class="property"><div class="key">Certificate</div><div class="value">${item.certificate}</div></div>
                 <div class="property"><div class="key">Email</div><div class="value">${item.email}</div></div>
-                <div class="property"><div class="key">Number</div><div class="value">${item.number}</div></div>
                 <div class="property"><div class="key">Skills</div><div class='value skills-list'>${skillsHTML}</div></div>
                 `;
         }
@@ -318,7 +341,7 @@ export function initFinder() {
                 <div class="property"><div class="key">Name</div><div class="value">${item.name}</div></div>
                 <div class="property"><div class="key">Explain</div><div class="value">${item.explain}</div></div>
                 <div class="property"><div class="key">Timeline</div><div class="value">${item.timeline}</div></div>
-                <a href="${item.link}" class="move-link">구경하기</a>
+                <a href="${item.link}" class="move-link" aria-label="${item.name} 이동하기">구경하기</a>
             `;
         }
 
@@ -332,16 +355,49 @@ export function initFinder() {
 
         const previewContainer = document.createElement('div');
         previewContainer.classList.add('finder-preview');
+        previewContainer.setAttribute('role', 'treeitem');
+        previewContainer.setAttribute('aria-label', `${item.name} 상세 정보`);
 
         previewContainer.innerHTML = `
             <div class="preview">
-                <img src="${item.image}" class="preview-image" data-name="${item.name}" data-parent="${parentName}"/>
+                <div role="button" tabindex="0" class="preview-image-btn" aria-label="${item.name} 이미지 확대">
+                    <img src="${item.image}" class="preview-image" alt="${item.name}" data-name="${item.name}" data-parent="${parentName}" />
+                </div>
                 <div class="property-container">${propertyHTML}</div>
             </div>
         `;
 
+        const imgBtn = previewContainer.querySelector('.preview-image-btn');
+        const img = imgBtn.querySelector('.preview-image');
+
+        imgBtn.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.code === 'Space') {
+                e.preventDefault();
+
+                const existingOverlay = document.querySelector('.quicklook-overlay');
+                if (existingOverlay) {
+                    const closeBtn = existingOverlay.querySelector('.quicklook-close');
+                    if (closeBtn) closeBtn.click();
+                    else existingOverlay.click();
+                    return;
+                }
+                img.click();
+            }
+        });
+
+        const moveLink = previewContainer.querySelector('.move-link');
+        if (moveLink) {
+            moveLink.addEventListener('keydown', (e) => {
+                if (e.key === ' ' || e.code === 'Space') {
+                    e.preventDefault();
+                    moveLink.click();
+                }
+            })
+        }
+
         const backBtn = document.createElement('button');
         backBtn.classList.add('preview-closeBtn');
+        backBtn.setAttribute('aria-label', 'Back to list');
         backBtn.textContent = '←';
         backBtn.addEventListener('click', () => {
             if (path.length > 1) openPath(path.slice(0, -1));
@@ -353,57 +409,80 @@ export function initFinder() {
 
     function initSkillTooltip() {
         let tooltip = null;
+        let isKeyboardMode = false;
 
-        document.addEventListener("mouseover", function (e) {
-            if (!finderWindow.classList.contains('active')) return;
-
-            if (!e.target.classList.contains("skill-item")) return;
-
-            const skill = e.target;
-            const text = skill.dataset.level || "설명 없음";
-
+        const showTooltip = (target) => {
+            const text = target.dataset.level || "설명 없음";
             if (tooltip) tooltip.remove();
 
             tooltip = document.createElement("div");
             tooltip.className = "skill-tooltip";
             tooltip.innerHTML = text;
             document.body.appendChild(tooltip);
-
             tooltip.style.opacity = "1";
 
             requestAnimationFrame(() => {
-                const rect = skill.getBoundingClientRect();
+                const rect = target.getBoundingClientRect();
                 const tt = tooltip.getBoundingClientRect();
-
                 let left = rect.left + rect.width / 2 - tt.width / 2;
                 let top = rect.top - tt.height - 12;
 
                 if (left < 8) left = 8;
-                if (left + tt.width > window.innerWidth - 8)
-                    left = window.innerWidth - tt.width - 8;
-
-                if (top < 8)
-                    top = rect.bottom + 12;
+                if (left + tt.width > window.innerWidth - 8) left = window.innerWidth - tt.width - 8;
+                if (top < 8) top = rect.bottom + 12;
 
                 tooltip.style.left = left + "px";
                 tooltip.style.top = top + "px";
             });
-        }, true);
+        };
 
-        document.addEventListener("mouseout", function (e) {
-            if (!finderWindow.classList.contains('active')) return;
-
-            if (!e.target.classList.contains("skill-item")) return;
+        const hideTooltip = () => {
             if (tooltip) {
                 tooltip.remove();
                 tooltip = null;
             }
+        };
+
+        document.addEventListener("mouseover", (e) => {
+            if (e.target.classList.contains("skill-item")) showTooltip(e.target);
+        }, true);
+        document.addEventListener("mouseout", (e) => {
+            if (e.target.classList.contains("skill-item")) hideTooltip();
+        }, true);
+
+        document.addEventListener("keydown", (e) => {
+            if (!e.target.classList.contains("skill-item")) return;
+
+            if (e.key === " " || e.code === "Space") {
+                e.preventDefault();
+                isKeyboardMode = true;
+                showTooltip(e.target);
+            }
+        });
+
+        document.addEventListener("focusin", (e) => {
+            if (e.target.classList.contains("skill-item")) {
+                if (isKeyboardMode) {
+                    showTooltip(e.target);
+                }
+            }
+        }, true);
+
+        document.addEventListener("focusout", (e) => {
+            if (e.target.classList.contains("skill-item")) {
+                hideTooltip();
+                if (!e.relatedTarget || !e.relatedTarget.classList.contains("skill-item")) {
+                    isKeyboardMode = false;
+                }
+            }
         }, true);
     }
+    initSkillTooltip();
 
-    /* ----------------------------------------------------------
-     * app-grid 연동 복구
-     * ---------------------------------------------------------- */
+
+    /* ============================================================
+     * app-grid
+     * ============================================================ */
     const apps = document.querySelectorAll('.app');
 
     apps.forEach(app => {
@@ -434,7 +513,6 @@ export function initFinder() {
                 window.WindowControls.openApp("finder", { path: targetPath });
                 return;
             }
-
             window.WindowControls.openApp(targetApp);
         });
     });
@@ -442,24 +520,50 @@ export function initFinder() {
     /* ============================================================
     * Quick Look 이미지 확대 기능
     * ============================================================ */
+    let currentQuickLookOverlay = null;
+
     document.addEventListener("click", (e) => {
         const img = e.target.closest('.preview-image');
         if (!img) return;
-        if (img.dataset.name === 'Profile') return;
-        if (img.dataset.parent === 'Tools') return;
-        /* ============================================================
-         * Quick Look
-         * ============================================================ */
-        function openQuickLook(img) {
-            const rect = img.getBoundingClientRect();
-            const scrollTop = window.scrollY;
-            const scrollLeft = window.scrollX;
 
+        // profile, tools는 확대 방지
+        if (img.dataset.name === 'Profile' || img.dataset.parent === 'Tools') return;
+
+        const isMobile = window.innerWidth <= 768;
+
+        // Quick Look
+        function openQuickLook(img) {
+            if (currentQuickLookOverlay) {
+                currentQuickLookOverlay.querySelector('.quicklook-close').click();
+                return;
+            }
             const overlay = document.createElement("div");
             overlay.className = "quicklook-overlay";
 
             const container = document.createElement("div");
             container.className = "quicklook-container";
+
+            const bigImg = document.createElement("img");
+            bigImg.src = img.src;
+
+            // mobile device
+            if (isMobile) {
+                container.classList.add('mobile');
+
+                container.appendChild(bigImg);
+                overlay.appendChild(container);
+                document.body.appendChild(overlay);
+
+                overlay.addEventListener('click', () => {
+                    overlay.remove();
+                });
+                return;
+            }
+
+            // Desktop device
+            const rect = img.getBoundingClientRect();
+            const scrollTop = window.scrollY;
+            const scrollLeft = window.scrollX;
 
             const header = document.createElement("div");
             header.className = "quicklook-header";
@@ -467,9 +571,6 @@ export function initFinder() {
                 <span class="quicklook-close">✕</span>
                 <span class="quicklook-name">${img.dataset.name}</span>
             `;
-
-            const bigImg = document.createElement("img");
-            bigImg.src = img.src;
 
             container.appendChild(header);
             container.appendChild(bigImg);
@@ -497,7 +598,10 @@ export function initFinder() {
                 container.style.top = startY + "px";
                 container.style.transform = "translate(-50%, -50%) scale(0.1)";
 
-                setTimeout(() => overlay.remove(), 250);
+                setTimeout(() => {
+                    overlay.remove();
+                    currentQuickLookOverlay = null;
+                }, 250);
             }
 
             overlay.addEventListener("click", (e) => {
@@ -518,7 +622,7 @@ export function initFinder() {
         }
 
         openQuickLook(img);
-    });
+    },);
 
     window.Finder = { openPath, finderData, getNodeByPath };
     window.dispatchEvent(new Event('FinderReady'));

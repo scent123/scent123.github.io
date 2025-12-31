@@ -1,362 +1,321 @@
 export function initWindowControls() {
+    
+    // 시스템 상수 및 설정
+    const Z_INDEX_BASE = 1000;
+    const ANIMATION_DURATION = 400;
+
     /* ============================================================
      * AppCore
      * ============================================================ */
     const AppCore = {
-
-        setActiveDockIcon(appName) {
-            if (!appName) return;
+                updateDockIcon(appName, isActive) {
             const icon = document.querySelector(`.dock-icon[data-app="${appName}"]`);
             if (!icon) return;
-            if (window.innerWidth <= 768) icon.style.display = "flex";
-            icon.classList.add("active");
+
+            if (isActive) {
+                icon.classList.add("active");
+                if (window.innerWidth <= 768) icon.style.display = "flex";
+            } else {
+                icon.classList.remove("active");
+                if (window.innerWidth <= 768) icon.style.display = "none";
+            }
         },
 
-        clearActiveDockIcon(appName) {
-            if (!appName) return;
-            const icon = document.querySelector(`.dock-icon[data-app="${appName}"]`);
-            if (!icon) return;
-            icon.classList.remove("active");
-            if (window.innerWidth <= 768) icon.style.display = "none";
-        },
-
-        /* 윈도우 복원 + 포커스 강제 이동 */
-        focusOrRestoreWindow(appName) {
-            if (!appName) return;
-            const win = document.querySelector(`.window.${appName}`);
+        focusWindow(win) {
             if (!win) return;
 
-            // 최소화 상태 복원
-            if (win.classList.contains("is-minimizing")) {
-                if (win.dataset.restoreWidth) win.style.width = win.dataset.restoreWidth;
-                if (win.dataset.restoreHeight) win.style.height = win.dataset.restoreHeight;
-                if (win.dataset.restoreLeft) win.style.left = win.dataset.restoreLeft;
-                if (win.dataset.restoreTop) win.style.top = win.dataset.restoreTop;
-                if (appName !== "finder") win.style.transform = "translateY(0) scale(1)";
-                win.classList.remove("is-minimizing");
-                win.classList.add("active");
+            const allWindows = document.querySelectorAll('.window');
+            const maxZ = Math.max(...Array.from(allWindows).map(w => parseInt(w.style.zIndex) || Z_INDEX_BASE));
+
+            allWindows.forEach(w => w.classList.remove('focused'));
+            win.classList.add('focused');
+
+            if (parseInt(win.style.zIndex || 0) < maxZ || allWindows.length === 1) {
+                win.style.zIndex = maxZ + 1;
             }
 
-            // z-index 최상위로
-            const newZ = Math.max(
-                ...Array.from(document.querySelectorAll('.window')).map(w => parseInt(w.style.zIndex) || 0),
-                1000
-            ) + 1;
-            win.style.zIndex = newZ;
+            const dockMenu = document.querySelector('.dock-menu');
+            if (dockMenu?.classList.contains('active')) {
+                dockMenu.classList.remove('active');
+                document.querySelector('.dock-start')?.setAttribute('aria-expanded', 'false');
+            }
+        },
 
-            // 모든 창 focus 제거 후 해당 창에 부여
-            document.querySelectorAll('.window').forEach(w => w.classList.remove('focused'));
-            win.classList.add('focused');
+        /** 최소화 복구 */
+        restoreWindow(win) {
+            win.classList.remove('animating');
+            win.style.display = 'flex';
+
+            const { restoreWidth, restoreHeight, restoreLeft, restoreTop } = win.dataset;
+            if (restoreWidth) win.style.width = restoreWidth;
+            if (restoreHeight) win.style.height = restoreHeight;
+            if (restoreLeft) win.style.left = restoreLeft;
+            if (restoreTop) win.style.top = restoreTop;
+
+            void win.offsetWidth;
+
+            win.classList.add('animating');
+            win.style.transform = "scale(1) translateY(0)";
+            win.style.opacity = '1';
+            win.classList.remove("is-minimizing");
+            win.classList.add("active");
+
+            setTimeout(() => win.classList.remove('animating'), ANIMATION_DURATION + 50);
+            this.focusWindow(win);
         },
 
         openApp(appName, options = {}) {
-            if (!appName) return;
-
-            if (appName === "finder") {
-                this.openFinder(options.path || null);
-                return;
-            }
+            if (appName === "finder") return this.openFinder(options.path);
 
             const win = document.querySelector(`.window.${appName}`);
             if (!win) return;
 
-            const alreadyOpen = win.classList.contains("active") || win.classList.contains("is-minimizing");
-
-            if (alreadyOpen) {
-                this.focusOrRestoreWindow(appName);
-                this.setActiveDockIcon(appName);
+            if (win.classList.contains("active") || win.classList.contains("is-minimizing")) {
+                win.classList.contains("is-minimizing") ? this.restoreWindow(win) : this.focusWindow(win);
+                this.updateDockIcon(appName, true);
                 return;
             }
 
-            win.classList.add("active");
-            win.style.opacity = 0;
+            win.style.display = 'flex';
+            win.classList.add("active", "animating");
+            win.style.opacity = "0";
             win.style.transform = "scale(0.95)";
-            setTimeout(() => { win.style.opacity = 1; win.style.transform = "scale(1)"; }, 200);
 
-            this.setActiveDockIcon(appName);
-            this.focusOrRestoreWindow(appName);
+            void win.offsetWidth;
+
+            win.style.opacity = "1";
+            win.style.transform = "scale(1)";
+            
+            this.updateDockIcon(appName, true);
+            this.focusWindow(win);
+
+            setTimeout(() => win.classList.remove("animating"), ANIMATION_DURATION);
         },
 
+        /** Finder 전용 오픈 로직 (경로 제어 포함) */
         openFinder(path = null) {
             const win = document.querySelector(".window.finder");
             if (!win) return;
 
-            if (win.classList.contains("is-minimizing")) {
-                win.classList.remove("is-minimizing");
-                win.style.display = '';
-                win.style.transform = 'translateY(0) scale(1)';
-                win.style.opacity = 1;
-                win.classList.add('active');
-            } else {
-                win.classList.add('active');
-            }
-
-            this.setActiveDockIcon("finder");
-            this.focusOrRestoreWindow("finder");
-
             const applyPath = () => {
-                if (!window.Finder?.openPath) return;
-                const target = path && Array.isArray(path)
-                    ? path
-                    : (window.Finder.currentPath || ["Users", "Seonjin"]);
-                window.Finder.openPath(target);
+                if (window.Finder?.openPath) {
+                    const targetPath = path || window.Finder.currentPath || ["Users", "Seonjin", "Desktop"];
+                    window.Finder.openPath(targetPath);
+                }
             };
 
-            if (window.Finder?.openPath) applyPath();
-            else window.addEventListener("FinderReady", () => applyPath(), { once: true });
+            if (win.classList.contains("active") || win.classList.contains("is-minimizing")) {
+                if (path) applyPath();
+                win.classList.contains("is-minimizing") ? this.restoreWindow(win) : this.focusWindow(win);
+            } else {
+                win.style.display = 'flex';
+                win.classList.add('active', 'animating');
+                win.style.opacity = "0";
+                win.style.transform = "scale(0.95)";
+
+                void win.offsetWidth;
+                win.style.opacity = "1";
+                win.style.transform = "scale(1)";
+
+                applyPath();
+                this.focusWindow(win);
+                setTimeout(() => win.classList.remove('animating'), ANIMATION_DURATION);
+            }
+            this.updateDockIcon("finder", true);
         },
 
+        /** 앱 종료 */
         closeApp(appName) {
             const win = document.querySelector(`.window.${appName}`);
             if (!win) return;
-            win.classList.remove("active");
-            this.clearActiveDockIcon(appName);
+
+            win.classList.add("is-closing");
+            setTimeout(() => {
+                win.classList.remove("active", "is-closing", "animating", "focused");
+                win.style.display = 'none';
+                win.style.opacity = '';
+                win.style.transform = '';
+            }, 200);
+            this.updateDockIcon(appName, false);
         }
     };
 
     /* ============================================================
-     * 윈도우 이동 / 크기 조절 / 최소화 기능 유지
+     * Drag & Resize
      * ============================================================ */
     const windows = document.querySelectorAll(".window");
-
-    function hideWindowElement(win) {
-        if (win.classList.contains("is-minimizing")) return;
-        win.classList.remove("active");
-        win.style.width = win.style.height = win.style.top = win.style.left = win.style.opacity = "";
-    }
 
     windows.forEach(win => {
         const header = win.querySelector(".header");
         const handles = win.querySelectorAll(".resize-handle");
 
-        let isDragging = false;
-        let isResizing = false;
-        let startX, startY, startWidth, startHeight, startLeft, startTop, currentHandle;
+        let state = { isDragging: false, isResizing: false, handle: null };
+        let offset = { x: 0, y: 0, w: 0, h: 0, l: 0, t: 0 };
 
+        // 윈도우 클릭 시 최상단으로
+        win.addEventListener("mousedown", () => AppCore.focusWindow(win));
+
+        // 드래그 시작
         if (header) {
             header.addEventListener("mousedown", e => {
                 if (e.target.closest(".remote")) return;
-                isDragging = true;
-                startX = e.clientX - win.offsetLeft;
-                startY = e.clientY - win.offsetTop;
-
-                // 포커스 이동
-                const z = Math.max(...Array.from(document.querySelectorAll('.window')).map(w => parseInt(w.style.zIndex) || 0)) + 1;
-                win.style.zIndex = z;
-                document.querySelectorAll('.window').forEach(w => w.classList.remove('focused'));
-                win.classList.add('focused');
+                state.isDragging = true;
+                offset.x = e.clientX - win.offsetLeft;
+                offset.y = e.clientY - win.offsetTop;
             });
         }
 
-        handles.forEach(handle => handle.addEventListener("mousedown", e => {
-            e.preventDefault();
-            if (win.classList.contains("is-zoomed")) return;
-            isResizing = true;
-            currentHandle = [...handle.classList].find(cls => cls !== 'resize-handle');
-            startX = e.clientX; startY = e.clientY;
-            startWidth = win.offsetWidth; startHeight = win.offsetHeight;
-            startLeft = win.offsetLeft; startTop = win.offsetTop;
-        }));
+        // 리사이즈 시작
+        handles.forEach(handle => {
+            handle.addEventListener("mousedown", e => {
+                e.preventDefault();
+                if (win.classList.contains("is-zoomed")) return;
+                state.isResizing = true;
+                state.handle = Array.from(handle.classList).find(c => c !== 'resize-handle');
+                offset.startX = e.clientX; offset.startY = e.clientY;
+                offset.w = win.offsetWidth; offset.h = win.offsetHeight;
+                offset.l = win.offsetLeft; offset.t = win.offsetTop;
+            });
+        });
 
+        // 마우스 이동 핸들러
         document.addEventListener("mousemove", e => {
-            if (win.classList.contains("is-zoomed")) isDragging = false;
-
-            if (isDragging) {
-                win.style.left = (e.clientX - startX) / 16 + "rem";
-                win.style.top = (e.clientY - startY) / 16 + "rem";
+            if (state.isDragging && !win.classList.contains("is-zoomed")) {
+                win.style.left = `${e.clientX - offset.x}px`;
+                win.style.top = `${e.clientY - offset.y}px`;
             }
 
-            if (isResizing) {
-                let dx = e.clientX - startX,
-                    dy = e.clientY - startY,
-                    w = startWidth,
-                    h = startHeight,
-                    L = startLeft,
-                    T = startTop;
+            if (state.isResizing) {
+                let dx = e.clientX - offset.startX, dy = e.clientY - offset.startY;
+                let nw = offset.w, nh = offset.h, nl = offset.l, nt = offset.t;
 
-                switch (currentHandle) {
-                    case "right": w += dx; break;
-                    case "left": w -= dx; L += dx; break;
-                    case "bottom": h += dy; break;
-                    case "top": h -= dy; T += dy; break;
-                    case "top-left": w -= dx; L += dx; h -= dy; T += dy; break;
-                    case "top-right": w += dx; h -= dy; T += dy; break;
-                    case "bottom-left": w -= dx; L += dx; h += dy; break;
-                    case "bottom-right": w += dx; h += dy; break;
-                }
+                if (state.handle.includes("right")) nw = offset.w + dx;
+                if (state.handle.includes("left")) { nw = offset.w - dx; nl = offset.l + dx; }
+                if (state.handle.includes("bottom")) nh = offset.h + dy;
+                if (state.handle.includes("top")) { nh = offset.h - dy; nt = offset.t + dy; }
 
-                if (w > 300) {
-                    win.style.width = w / 16 + "rem";
-                    win.style.left = L / 16 + "rem";
-                }
-                if (h > 200) {
-                    win.style.height = h / 16 + "rem";
-                    win.style.top = T / 16 + "rem";
-                }
+                if (nw > 300) { win.style.width = `${nw}px`; win.style.left = `${nl}px`; }
+                if (nh > 200) { win.style.height = `${nh}px`; win.style.top = `${nt}px`; }
             }
         });
 
         document.addEventListener("mouseup", () => {
-            isDragging = false;
-            isResizing = false;
+            state.isDragging = false;
+            state.isResizing = false;
         });
     });
 
     /* ============================================================
-    *  Remote Controls (Close / Minimize / Zoom) – 완전 복원
-    * ============================================================ */
-    const closeBtns = document.querySelectorAll(".remote .close");
-    const minBtns = document.querySelectorAll(".remote .minimize");
-    const zoomBtns = document.querySelectorAll(".remote .zoom");
-
-    /* ---------------------------------------
-     * Close
-     * --------------------------------------- */
-    closeBtns.forEach(btn => {
+     * UI Control Events
+     * ============================================================ */
+    
+    // 닫기
+    document.querySelectorAll(".remote .close").forEach(btn => {
         btn.addEventListener("click", () => {
             const win = btn.closest(".window");
-            if (!win) return;
-
-            const appType = win.dataset.app || win.classList[1];
-            if (appType) WindowControls.clearActiveDockIcon(appType);
-
-            // Calculator 초기화
-            if (appType === "calculator") {
-                win.querySelector(".formula").textContent = "";
-                win.querySelector(".current").textContent = "0";
-                if (window.Calculator?.reset) window.Calculator.reset();
-            }
-
-            win.classList.add("is-closing");
-            setTimeout(() => {
-                win.classList.remove("is-closing", "is-zoomed");
-                win.classList.remove("active");
-                win.style.width = win.style.height = win.style.top = win.style.left = "";
-            }, 200);
+            const app = win.dataset.app || win.classList[1];
+            if (app === "calculator" && window.Calculator?.reset) window.Calculator.reset();
+            AppCore.closeApp(app);
         });
     });
 
-    /* ---------------------------------------
-     * Minimize
-     * --------------------------------------- */
-    minBtns.forEach(btn => {
+    // 최소화
+    document.querySelectorAll(".remote .minimize").forEach(btn => {
         btn.addEventListener("click", () => {
             const win = btn.closest(".window");
-            if (!win) return;
-
-            // 위치/크기 저장
             win.dataset.restoreWidth = win.style.width || win.offsetWidth + "px";
             win.dataset.restoreHeight = win.style.height || win.offsetHeight + "px";
             win.dataset.restoreLeft = win.style.left || win.offsetLeft + "px";
             win.dataset.restoreTop = win.style.top || win.offsetTop + "px";
 
+            win.classList.add('animating');
             win.style.transform = "translateY(80vh) scale(0.25)";
+            win.style.opacity = "0";
             win.classList.add("is-minimizing");
 
             setTimeout(() => {
                 win.style.display = "none";
+                win.classList.remove('animating', 'focused');
             }, 350);
         });
     });
 
-    /* ---------------------------------------
-     * Zoom
-     * --------------------------------------- */
-    zoomBtns.forEach(btn => {
+    // 확대/축소
+    document.querySelectorAll(".remote .zoom").forEach(btn => {
         btn.addEventListener("click", () => {
             const win = btn.closest(".window");
-            if (!win) return;
-
-            // Calculator / Weather 줌 비활성
             if (win.classList.contains("calculator") || win.classList.contains("weather")) return;
 
-            const isZoomed = win.classList.contains("is-zoomed");
-
-            if (!isZoomed) {
+            if (!win.classList.contains("is-zoomed")) {
                 win.dataset.prevTop = win.style.top || win.offsetTop + "px";
                 win.dataset.prevLeft = win.style.left || win.offsetLeft + "px";
                 win.dataset.prevWidth = win.style.width || win.offsetWidth + "px";
                 win.dataset.prevHeight = win.style.height || win.offsetHeight + "px";
 
-                win.style.top = "0";
-                win.style.left = "0";
-                win.style.width = "100vw";
-                win.style.height = "calc(100vh - 5rem)";
+                Object.assign(win.style, { top: '0', left: '0', width: '100vw', height: 'calc(100vh - 4rem)' });
                 win.classList.add("is-zoomed");
             } else {
-                win.style.top = win.dataset.prevTop;
-                win.style.left = win.dataset.prevLeft;
-                win.style.width = win.dataset.prevWidth;
-                win.style.height = win.dataset.prevHeight;
+                Object.assign(win.style, {
+                    top: win.dataset.prevTop, left: win.dataset.prevLeft,
+                    width: win.dataset.prevWidth, height: win.dataset.prevHeight
+                });
                 win.classList.remove("is-zoomed");
             }
         });
     });
 
     /* ============================================================
-     * 새 포커스 시스템 (dockMenu + 외부 클릭 + 윈도우 클릭)
+     * Accessibility & Focus Management
      * ============================================================ */
-    /* 윈도우 내부 아무 곳이나 클릭 시 focus */
-    windows.forEach(win => {
-        win.addEventListener("mousedown", () => {
-            document.querySelectorAll('.window').forEach(w => w.classList.remove('focused'));
+    function setupFocusTrap(windowEl) {
+        if (windowEl.dataset.focusTrapBound) return;
+        windowEl.dataset.focusTrapBound = "true";
 
-            // dockMenu가 active이면 포커스 부여 금지
-            if (document.querySelector('.dock-menu')?.classList.contains('active')) return;
+        windowEl.addEventListener('keydown', (e) => {
+            if (e.key !== 'Tab') return;
+            const focusables = windowEl.querySelectorAll('button:not([disabled]), [href], input, [tabindex="0"], .folder, .skill-item');
+            if (!focusables.length) return;
 
-            win.classList.add('focused');
-            win.style.zIndex = Math.max(...Array.from(document.querySelectorAll('.window')).map(w => parseInt(w.style.zIndex) || 0)) + 1;
+            const first = focusables[0], last = focusables[focusables.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
         });
-    });
+    }
 
-    /* window 외부 클릭 시 focus 제거 */
+    /** 앱 실행 시 시각적 포커스 가이드 */
+    function handleInitialFocus(appName, options = {}) {
+        const win = document.querySelector(`.window.${appName}`);
+        if (!win) return;
+        setupFocusTrap(win);
+
+        if (appName === 'finder') {
+            if (!options.path) {
+                setTimeout(() => {
+                    (win.querySelector('.folder.selected') || win.querySelector('.folder'))?.focus();
+                }, 100);
+            }
+        } else {
+            setTimeout(() => win.querySelector('.close')?.focus(), 300);
+        }
+    }
+
+    // 빈 화면 클릭 시 포커스 해제
     document.addEventListener("mousedown", e => {
-        if (
-            !e.target.closest('.window') &&
-            !e.target.closest('.dock-menu') &&
-            !e.target.closest('.dock-icon') &&
-            !e.target.closest('.app')
-        ) {
+        const ignoreSelectors = ['.window', '.dock-menu', '.dock-icon', '.app'];
+        if (!ignoreSelectors.some(s => e.target.closest(s))) {
             document.querySelectorAll('.window').forEach(w => w.classList.remove('focused'));
         }
     });
 
-    /* dock-menu active 시 모든 focus 제거 (MutationObserver 사용) */
-    const dockMenu = document.querySelector('.dock-menu');
-    if (dockMenu) {
-        const obs = new MutationObserver(() => {
-            if (dockMenu.classList.contains('active')) {
-                document.querySelectorAll('.window').forEach(w => w.classList.remove('focused'));
-            }
-        });
-        obs.observe(dockMenu, { attributes: true, attributeFilter: ['class'] });
-    }
-
-    /* dockMenu 검색 결과 클릭 → 해당 창 포커스 */
-    document.querySelectorAll('.dock-menu .menu-item').forEach(el => {
-        el.addEventListener('click', () => {
-            const app = el.dataset.app;
-            if (!app) return;
-
-            const win = document.querySelector(`.window.${app}`);
-            if (!win) return;
-
-            dockMenu?.classList.remove('active');
-            document.querySelectorAll('.window').forEach(w => w.classList.remove('focused'));
-            win.classList.add('focused');
-            win.style.zIndex = Math.max(...Array.from(document.querySelectorAll('.window')).map(w => parseInt(w.style.zIndex) || 0)) + 1;
-        });
-    });
-
     /* ============================================================
-     * WindowControls 외부 노출
+     * Public API
      * ============================================================ */
     window.WindowControls = {
-        openApp: AppCore.openApp.bind(AppCore),
-        openFinder: AppCore.openFinder.bind(AppCore),
+        openApp: (name, opt) => { AppCore.openApp(name, opt); handleInitialFocus(name, opt); },
+        openFinder: (path) => { AppCore.openFinder(path); handleInitialFocus('finder', { path }); },
         closeApp: AppCore.closeApp.bind(AppCore),
-        focusOrRestoreWindow: AppCore.focusOrRestoreWindow.bind(AppCore),
-        setActiveDockIcon: AppCore.setActiveDockIcon.bind(AppCore),
-        clearActiveDockIcon: AppCore.clearActiveDockIcon.bind(AppCore),
+        focusWindow: AppCore.focusWindow.bind(AppCore),
+        setActiveDockIcon: (name) => AppCore.updateDockIcon(name, true),
+        clearActiveDockIcon: (name) => AppCore.updateDockIcon(name, false)
     };
 }

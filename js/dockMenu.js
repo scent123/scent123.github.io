@@ -3,6 +3,12 @@ export function initDockMenu() {
     const dockMenu = document.querySelector(".dock-menu");
     if (!dockStart || !dockMenu) return;
 
+    dockStart.setAttribute('role', 'button');
+    dockStart.setAttribute('tabindex', '0');
+    dockStart.setAttribute('aira-haspopup', 'true');
+    dockStart.setAttribute('aria-expanded', 'false');
+    dockStart.setAttribute('aria-controls', 'dock-menu-list');
+
     // menuList
     const menuList = dockMenu.querySelector(".menu-list");
     if (!menuList) {
@@ -17,6 +23,11 @@ export function initDockMenu() {
         searchInput = searchWrapper.querySelector("input") || searchWrapper;
     }
 
+    const liveStatus = document.createElement('div');
+    liveStatus.className = 'sr-only';
+    liveStatus.setAttribute('aria-live', 'polite');
+    document.body.appendChild(liveStatus);
+
     function toggleDarkMode() {
         document.body.classList.toggle('darkmode');
     }
@@ -26,8 +37,8 @@ export function initDockMenu() {
      * ============================================================ */
     function closeDockMenu() {
         if (!dockMenu.classList.contains("active")) return;
-
         dockMenu.classList.remove("active");
+        dockStart.setAttribute('aria-expanded', 'false');
 
         // 입력 초기화
         if (searchInput) {
@@ -43,7 +54,7 @@ export function initDockMenu() {
      * ============================================================ */
     function findNodesByName(root, nameLower) {
         const results = [];
-        if (!root) return results;
+        if (!window.Finder?.finderData) return results;
 
         function dfs(node, path) {
             if (!node) return;
@@ -114,7 +125,7 @@ export function initDockMenu() {
     }
 
     /* ============================================================
-     *  flattenFinderData — 검색 결과 없을 때 전체 표시용
+     *  검색 결과 없을 때 전체 표시용
      * ============================================================ */
     function flattenFinderData() {
         const all = [];
@@ -163,7 +174,7 @@ export function initDockMenu() {
     }
 
     /* ============================================================
-     *  renderRecent — Desktop 기준 최근 항목
+     *  Desktop 기준 최근 항목
      * ============================================================ */
     function renderRecent() {
         menuList.innerHTML = "";
@@ -183,6 +194,8 @@ export function initDockMenu() {
 
             const liFolder = document.createElement("li");
             liFolder.className = "menu-item folder-item";
+            liFolder.setAttribute('role', 'menuitem');
+            liFolder.setAttribute('tabindex', '0');
 
             const folderPath = [...desktopInfo.path, folder.name];
             liFolder.dataset.path = folderPath.join("/");
@@ -223,7 +236,7 @@ export function initDockMenu() {
     }
 
     /* ============================================================
-     *  renderSearchResults — 검색
+     *  검색
      * ============================================================ */
     function renderSearchResults(keyword) {
         menuList.innerHTML = "";
@@ -238,7 +251,7 @@ export function initDockMenu() {
 
         if (isModeSearch) {
             header.textContent = isDark ? "Search: Light Mode" : "Search: Dark Mode";
-        
+
             const li = document.createElement('li');
             li.className = 'menu-item setting-item';
 
@@ -306,7 +319,7 @@ export function initDockMenu() {
     }
 
     /* ============================================================
-     *  attachOpenHandlers — Finder 열기
+     *  Finder 열기
      * ============================================================ */
     function attachOpenHandlers() {
         const items = menuList.querySelectorAll(".menu-item");
@@ -348,7 +361,7 @@ export function initDockMenu() {
     }
 
     /* ============================================================
-     *  Finder path 열기 — 공통 닫기 함수 사용
+     *  공통 닫기 함수 사용
      * ============================================================ */
     function handleOpenPathRaw(rawPath) {
         if (!rawPath) return;
@@ -411,6 +424,14 @@ export function initDockMenu() {
                     const q = inputEl.value.trim();
                     if (!q) return;
 
+                    const isModeSearch = q.includes('dark') || q.includes('light') || q.includes('mode');
+                    if (isModeSearch) {
+                        e.preventDefault();
+                        toggleDarkMode();
+                        closeDockMenu();
+                        return;
+                    }
+
                     const res = searchFinder(q.toLowerCase());
                     if (res.length) {
                         const path = res[0].path;
@@ -421,9 +442,18 @@ export function initDockMenu() {
         }
     }
 
+
+
     /* ============================================================
      *  Dock 아이콘 클릭 (토글)
      * ============================================================ */
+    dockStart.addEventListener('keydown', (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            dockStart.click();
+        }
+    });
+
     dockStart.addEventListener("click", (e) => {
         e.stopPropagation();
 
@@ -432,7 +462,6 @@ export function initDockMenu() {
 
         if (willOpen) {
             renderRecent();
-
             const el = searchInput?.tagName === "INPUT"
                 ? searchInput
                 : searchInput?.querySelector("input");

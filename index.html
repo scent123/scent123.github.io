@@ -6,90 +6,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <link rel="stylesheet" href="./css/reset.css">
     <link rel="stylesheet" href="./css/style.css">
-    <title>SeonJin Kim</title>
+    <title>SeonJin Kim | Portfolio</title>
 </head>
 
 <body>
-    <div class="window finder" data-app="finder">
+    <div class="window finder" data-app="finder" role="dialog" aria-labelledby="finder-title" arial-modal="false">
         <div class="header">
             <div class="remote">
-                <div class="buttons close"></div>
-                <div class="buttons minimize"></div>
-                <div class="buttons zoom"></div>
+                <button type="button" class="buttons close" aria-label="Close"></button>
+                <button type="button" class="buttons minimize" aria-label="minimize"></button>
+                <button type="button" class="buttons zoom" aria-label="Zoom"></button>
             </div>
             <div class="directory">
-                <div class="folder-icon"></div>
-                <h2 class="folder-name"></h2>
+                <div class="folder-icon" role="presentation"></div>
+                <h2 id="finder-title" class="folder-name"></h2>
             </div>
         </div>
-        <div class="content">
-        </div>
+        <div class="content"></div>
 
         <!-- resize-handles -->
-        <div class="resize-handle top"></div>
-        <div class="resize-handle right"></div>
-        <div class="resize-handle bottom"></div>
-        <div class="resize-handle left"></div>
-
-        <div class="resize-handle top-left"></div>
-        <div class="resize-handle top-right"></div>
-        <div class="resize-handle bottom-left"></div>
-        <div class="resize-handle bottom-right"></div>
+        <div class="resize-handles" aria-hidden="true">
+            <div class="resize-handle top"></div>
+            <div class="resize-handle right"></div>
+            <div class="resize-handle bottom"></div>
+            <div class="resize-handle left"></div>
+            <div class="resize-handle top-left"></div>
+            <div class="resize-handle top-right"></div>
+            <div class="resize-handle bottom-left"></div>
+            <div class="resize-handle bottom-right"></div>
+        </div>
     </div>
 
     <div class="window calculator" data-app="calculator">
         <div class="header">
             <div class="remote">
-                <div class="buttons close"></div>
-                <div class="buttons minimize"></div>
-                <div class="buttons zoom"></div>
+                <button type="button" class="buttons close" aria-label="Close"></button>
+                <button type="button" class="buttons minimize" aria-label="minimize"></button>
+                <button type="button" class="buttons zoom" aria-label="Zoom"></button>
             </div>
         </div>
         <div class="content">
             <div class="display-wrapper">
                 <div class="display-blur"></div>
                 <div class="display">
-                    <div class="display-inner">
+                    <div class="display-inner" aria-live="polite" aria-atomic="true">
                         <div class="formula"></div>
                         <div class="current">0</div>
                     </div>
                 </div>
             </div>
             <div class="buttons">
-                <button class="btn grey" data-value="back">⌫</button>
-                <button class="btn grey" data-value="AC">AC</button>
-                <button class="btn grey">&#37;</button>
-                <button class="btn orange" data-value="/">&#247;</button>
+                <button type="button" class="btn grey" data-value="back" aria-label="Backspace">⌫</button>
+                <button type="button" class="btn grey" data-value="AC" aria-label="All Clear">AC</button>
+                <button type="button" class="btn grey" data-value="%" aria-label="Percentage">&#37;</button>
+                <button type="button" class="btn orange" data-value="/" aria-label="Divide">&#247;</button>
 
-                <button class="btn">7</button>
-                <button class="btn">8</button>
-                <button class="btn">9</button>
-                <button class="btn orange" data-value="*">&#10005;</button>
+                <button type="button" class="btn" data-value="7">7</button>
+                <button type="button" class="btn" data-value="8">8</button>
+                <button type="button" class="btn" data-value="9">9</button>
+                <button type="button" class="btn orange" data-value="*" aria-label="Multiply">×</button>
 
-                <button class="btn">4</button>
-                <button class="btn">5</button>
-                <button class="btn">6</button>
-                <button class="btn orange" data-value="-">&#8722;</button>
+                <button type="button" class="btn" data-value="4">4</button>
+                <button type="button" class="btn" data-value="5">5</button>
+                <button type="button" class="btn" data-value="6">6</button>
+                <button type="button" class="btn orange" data-value="-" aria-label="Minus">−</button>
 
-                <button class="btn">1</button>
-                <button class="btn">2</button>
-                <button class="btn">3</button>
-                <button class="btn orange" data-value="+">&#43;</button>
+                <button type="button" class="btn" data-value="1">1</button>
+                <button type="button" class="btn" data-value="2">2</button>
+                <button type="button" class="btn" data-value="3">3</button>
+                <button type="button" class="btn orange" data-value="+" aria-label="Plus">&#43;</button>
 
-                <button class="btn">+/-</button>
-                <button class="btn">0</button>
-                <button class="btn">&#46;</button>
-                <button class="btn orange" data-value="=">&#61;</button>
+                <button type="button" class="btn" data-value="+/-" aria-label="sign inversion">+/-</button>
+                <button type="button" class="btn" data-value="0">0</button>
+                <button type="button" class="btn" data-value="." aria-label="dot">&#46;</button>
+                <button type="button" class="btn orange" data-value="=" aria-label="result">&#61;</button>
             </div>
         </div>
     </div>
 
-    <div class="window weather" data-app="weather">
+    <div class="window weather" data-app="weather" role="dialog" aria-labelledby="weather-title">
         <div class="header">
+            <h2 id="weather-title" class="sr-only">Weather</h2>
             <div class="remote">
-                <div class="buttons close"></div>
-                <div class="buttons minimize"></div>
-                <div class="buttons zoom"></div>
+                <button type="button" class="buttons close" aria-label="Close"></button>
+                <button type="button" class="buttons minimize" aria-label="minimize"></button>
+                <button type="button" class="buttons zoom" aria-label="Zoom"></button>
             </div>
         </div>
         <div class="content">
@@ -108,7 +109,7 @@
 
             <div class="weather-daily">
                 <div class="daily-header">
-                    <img src="./images/daily-icon.png" alt="calender-icon">
+                    <img src="./images/daily-icon.png" alt="weather-calender-icon" role="presentation">
                     <span class="daily-title">10일간의 일기예보</span>
                 </div>
                 <div class="daily-scroll">
@@ -119,72 +120,82 @@
     </div>
 
     <main>
-        <section class="app-grid">
-            <h2>app-launchPad</h2>
-            <button class="app" data-app="finder">
-                <img src="./images/Profile.png" alt="Profile-image" class="profile-icon">
-                <span class='app-name'>Profile</span>
+        <section class="app-grid" role="navigation" aria-label="Applications">
+            <h2 class="sr-only">app-launchPad</h2>
+            <button type="button" class="app" data-app="finder" aria-label="Open Finder">
+                <img src="./images/Profile.png" alt="Profile" class="profile-icon">
+                <span class='app-name' aria-hidden="true">Profile</span>
             </button>
-            <button class="app" data-app="finder">
-                <img src="./images/Design.png" alt="Design-image" class="design-icon">
-                <span class='app-name'>Design</span>
+            <button type="button" class="app" data-app="finder" aria-label="Open Design">
+                <img src="./images/Design.png" alt="Design" class="design-icon">
+                <span class='app-name' aria-hidden="true">Design</span>
             </button>
-            <button class="app" data-app="finder">
-                <img src="./images/Projects.png" alt="Projects-image" class="project-icon">
-                <span class='app-name'>Projects</span>
+            <button type="button" class="app" data-app="finder" aria-label="Open Projects">
+                <img src="./images/Projects.png" alt="Projects" class="project-icon">
+                <span class='app-name' aria-hidden="true">Projects</span>
             </button>
-            <button class="app" data-app="finder">
-                <img src="./images/Tools.png" alt="Tools-image" class="tool-icon">
-                <span class='app-name'>Tools</span>
+            <button type="button" class="app" data-app="finder" aria-label="Open Tools">
+                <img src="./images/Tools.png" alt="Tools" class="tools-icon">
+                <span class='app-name' aria-hidden="true">Tools</span>
             </button>
-            <button class="app" data-app="calculator">
-                <img src="./images/calculator.png" alt="Calculator-image" class="calender-icon">
-                <span class='app-name'>Calculator</span>
+            <button type="button" class="app" data-app="calculator" aria-label="Open Calculator">
+                <img src="./images/calculator.png" alt="Calculator" class="calculator-icon">
+                <span class='app-name' aria-hidden="true">Calculator</span>
             </button>
-            <button class="app" data-app="weather">
-                <img src="./images/weather.png" alt="Weather-image" class="weather-icon">
-                <span class='app-name'>Weather</span>
+            <button type="button" class="app" data-app="weather" aria-label="Open Weather">
+                <img src="./images/weather.png" alt="Weather" class="weather-icon">
+                <span class='app-name' aria-hidden="true">Weather</span>
             </button>
-            <a class="app" data-app="resume"
-                href="./resume.pdf"
-                target="_blank" rel="noopener noreferrer">
-                <img src="./images/resume.png" alt="Resume-image" class="resume-icon">
-                <span class='app-name'>Resume</span>
+            <a class="app" data-app="resume" href="./resume.pdf" target="_blank" rel="noopener noreferrer"
+                aria-label="Open Resume">
+                <img src="./images/resume.png" alt="Resume-icon" class="resume-icon">
+                <span class='app-name' aria-hidden="true">Resume</span>
             </a>
             <a class="app" data-app="snippets"
                 href="https://pickled-butterkase-d37.notion.site/my_reference-11c76061cfcd8078b1aef43102c6b840?source=copy_link"
-                target="_blank" rel="noopener noreferrer">
-                <img src="./images/Snippets.png" alt="Snippets-image" class="snippet-icon">
-                <span class='app-name'>Snippets</span>
+                target="_blank" rel="noopener noreferrer" aria-label="Open Snippets">
+                <img src="./images/Snippets.png" alt="Snippets-icon" class="snippets-icon">
+                <span class='app-name' aria-hidden="true">Snippets</span>
             </a>
         </section>
     </main>
 
-<nav class="dock-menu" aria-label="Start Menu">
-    <div class="dock-menu-overlay">
-        <h2 class="menu-header">Recent Items</h2>
-        <ul class="menu-list"></ul>
-    </div>
-    <input type="search" class="menu-search" placeholder="Search for ..."/>
-</nav>
-
-    <footer class="dock">
-        <div class="dock-start">SeonJin Kim</div>
-        <div class="dock-icons">
-            <button class="dock-icon" data-app="finder"><img src="./images/folder.png" alt="folder-icon"></button>
-            <button class="dock-icon" data-app="calculator"><img src="./images/calculator.png" alt="calender-icon"></button>
-            <button class="dock-icon" data-app="weather"><img src="./images/weather.png" alt="weather-icon"></button>
-            <a class="dock-icon" data-app="resume"
-                href="./resume.pdf"
-                target="_blank" rel="noopener noreferrer"><img src="./images/resume.png" alt="resume-icon"></a>
-            <a class="dock-icon" data-app="snippets"
-                href="https://pickled-butterkase-d37.notion.site/my_reference-11c76061cfcd8078b1aef43102c6b840?source=copy_link"
-                target="_blank" rel="noopener noreferrer"><img src="./images/Snippets.png" alt="snippet-icon"></a>
+    <nav class="dock-menu" aria-label="Start Menu">
+        <div class="dock-menu-overlay">
+            <h2 class="menu-header">Recent Items</h2>
+            <ul class="menu-list"></ul>
         </div>
-        <div class="dock-clock"></div>
+
+        <label for="dock-search" class="sr-only">Search</label>
+        <input type="search" id="dock-search" class="menu-search" placeholder="Search for ..." />
+    </nav>
+
+    <footer class="dock" role="contentinfo" aria-label="Dock">
+        <div class="dock-start" role="button" tabindex="0">SeonJin Kim</div>
+        <div class="dock-icons">
+            <button type="button" class="dock-icon" data-app="finder" aria-label="Open Finder">
+                <img src="./images/folder.png" alt="folder-icon">
+            </button>
+            <button type="button" class="dock-icon" data-app="calculator" aria-label="Open Calculator">
+                <img src="./images/calculator.png" alt="calculator-icon">
+            </button>
+            <button type="button" class="dock-icon" data-app="weather" aria-label="Open Weather">
+                <img src="./images/weather.png" alt="weather-icon">
+            </button>
+            <a class="dock-icon" href="./resume.pdf" target="_blank" rel="noopener noreferrer" data-app="resume"
+                aria-label="Open resume">
+                <img src="./images/resume.png" alt="resume-icon">
+            </a>
+            <a class="dock-icon" data-app="snippets" aria-label="Open Snippets" target="_blank"
+                rel="noopener noreferrer"
+                href="https://pickled-butterkase-d37.notion.site/my_reference-11c76061cfcd8078b1aef43102c6b840?source=copy_link">
+                <img src="./images/Snippets.png" alt="Snippets-icon">
+            </a>
+        </div>
+        <div class="dock-clock" role="timer" aria-live="off"></div>
     </footer>
 
-    <script type="module" src="./js/main.js"></script>
+    <script type="module" src="./js/script.js"></script>
 </body>
 
 </html>
