@@ -1,6 +1,5 @@
 export function initWindowControls() {
-    
-    // 시스템 상수 및 설정
+    // window focus용 z-index, animation 적용 시간
     const Z_INDEX_BASE = 1000;
     const ANIMATION_DURATION = 400;
 
@@ -8,7 +7,8 @@ export function initWindowControls() {
      * AppCore
      * ============================================================ */
     const AppCore = {
-                updateDockIcon(appName, isActive) {
+        // dock-icon active 표시
+        updateDockIcon(appName, isActive) {
             const icon = document.querySelector(`.dock-icon[data-app="${appName}"]`);
             if (!icon) return;
 
@@ -21,6 +21,7 @@ export function initWindowControls() {
             }
         },
 
+        // window focus
         focusWindow(win) {
             if (!win) return;
 
@@ -30,10 +31,26 @@ export function initWindowControls() {
             allWindows.forEach(w => w.classList.remove('focused'));
             win.classList.add('focused');
 
+            //focus된 window는 maxZ보다 1 큰 값을 저장
             if (parseInt(win.style.zIndex || 0) < maxZ || allWindows.length === 1) {
                 win.style.zIndex = maxZ + 1;
             }
 
+            // finder 오픈 시 selected에 포커스
+            if (win.classList.contains('finder')) {
+                const content = win.querySelector('.content');
+                const selectedItem = win.querySelector('.folder.selected');
+
+                // focus({preventScroll: true }) : finder 활성화 된 상태에서 dock icon 클릭 시 focus 이동 방지
+                if (selectedItem) {
+                    selectedItem.focus({ preventScroll: true });
+                }
+                else {
+                    win.focus({ preventScroll: true });
+                }
+            }
+
+            // dockMenu active 된 상태에서 window focus 시, dockMenu 비활성화
             const dockMenu = document.querySelector('.dock-menu');
             if (dockMenu?.classList.contains('active')) {
                 dockMenu.classList.remove('active');
@@ -41,62 +58,77 @@ export function initWindowControls() {
             }
         },
 
-        /** 최소화 복구 */
+        // 최소화 복구
         restoreWindow(win) {
             win.classList.remove('animating');
             win.style.display = 'flex';
 
+            // 최소화 시 저장해둔 너비,크기, 위치 값을 다시 선언해주고, 스타일을 적용
             const { restoreWidth, restoreHeight, restoreLeft, restoreTop } = win.dataset;
             if (restoreWidth) win.style.width = restoreWidth;
             if (restoreHeight) win.style.height = restoreHeight;
             if (restoreLeft) win.style.left = restoreLeft;
             if (restoreTop) win.style.top = restoreTop;
 
+            /* 
+             * void : 값을 얻는게 목적이 아니라, 읽는 과정에서 발생하는 스타일 계산이 목적이므로 void를 붙여 메모리,변수 낭비를 막는다.
+             * win.offsetWidth: 요소의 가로 너비를 가져오는 속성.
+             * ↳ 애니메이션의 정확한 효과를 위해 적용시킴
+             */
             void win.offsetWidth;
 
+            // 최소화 복구에 필요한 스타일 적용
             win.classList.add('animating');
             win.style.transform = "scale(1) translateY(0)";
             win.style.opacity = '1';
             win.classList.remove("is-minimizing");
             win.classList.add("active");
 
+            // 애니메이션 종료 후, move, resize 등에 문제가 되지 않게 animating 제거 및 해당 window focus
             setTimeout(() => win.classList.remove('animating'), ANIMATION_DURATION + 50);
             this.focusWindow(win);
         },
 
+        // 앱 열기
         openApp(appName, options = {}) {
+            // Finder는 전용 로직이 있으므로 해당 로직으로 실행.
             if (appName === "finder") return this.openFinder(options.path);
 
             const win = document.querySelector(`.window.${appName}`);
             if (!win) return;
 
+            // 해당 앱의 window가 활성화중이거나, 최소화 중이면 복구 및 dock-icon 활성화
             if (win.classList.contains("active") || win.classList.contains("is-minimizing")) {
                 win.classList.contains("is-minimizing") ? this.restoreWindow(win) : this.focusWindow(win);
                 this.updateDockIcon(appName, true);
                 return;
             }
 
+            // 활성화 애니메이션
             win.style.display = 'flex';
             win.classList.add("active", "animating");
             win.style.opacity = "0";
             win.style.transform = "scale(0.95)";
 
+            // 리플로우
             void win.offsetWidth;
 
             win.style.opacity = "1";
             win.style.transform = "scale(1)";
-            
+
             this.updateDockIcon(appName, true);
             this.focusWindow(win);
 
+            // animating 제거
             setTimeout(() => win.classList.remove("animating"), ANIMATION_DURATION);
         },
 
-        /** Finder 전용 오픈 로직 (경로 제어 포함) */
+        // Finder 전용 오픈 로직 (경로 제어 포함)
         openFinder(path = null) {
             const win = document.querySelector(".window.finder");
             if (!win) return;
 
+            // 
             const applyPath = () => {
                 if (window.Finder?.openPath) {
                     const targetPath = path || window.Finder.currentPath || ["Users", "Seonjin", "Desktop"];
@@ -124,19 +156,52 @@ export function initWindowControls() {
             this.updateDockIcon("finder", true);
         },
 
-        /** 앱 종료 */
+        // 앱 종료
         closeApp(appName) {
             const win = document.querySelector(`.window.${appName}`);
             if (!win) return;
 
             win.classList.add("is-closing");
             setTimeout(() => {
-                win.classList.remove("active", "is-closing", "animating", "focused");
+                // window에 적용된 클래스 모두 제거
+                win.classList.remove("active", "is-closing", "animating", "focused", "is-zoomed");
                 win.style.display = 'none';
+
+                // 리사이즈 된 window 초기화. (인라인 스타일 초기화)
+                win.style.width = '';
+                win.style.height = '';
+                win.style.left = '';
+                win.style.top = '';
                 win.style.opacity = '';
                 win.style.transform = '';
             }, 200);
+            // dock-icon active 제거
             this.updateDockIcon(appName, false);
+        },
+
+        /** 앱 실행 시 시각적 포커스 가이드 */
+        handleInitialFocus(appName, options = {}) {
+            const win = document.querySelector(`.window.${appName}`);
+            if (!win) return;
+            setupFocusTrap(win);
+
+            if (appName === 'finder') {
+                if (!options.path) {
+                    setTimeout(() => {
+                        (win.querySelector('.folder.selected') || win.querySelector('.folder'))?.focus();
+                    }, 100);
+                }
+            }
+            else if (appName === 'calculator') {
+                setTimeout(() => {
+                    const resultBtn = win.querySelector('button[data-value="="]');
+                    if (resultBtn) resultBtn.focus();
+                    else win.querySelector('.close')?.focus();
+                }, 300);
+            }
+            else {
+                setTimeout(() => win.querySelector('.close')?.focus(), 300);
+            }
         }
     };
 
@@ -149,13 +214,14 @@ export function initWindowControls() {
         const header = win.querySelector(".header");
         const handles = win.querySelectorAll(".resize-handle");
 
+        // 
         let state = { isDragging: false, isResizing: false, handle: null };
         let offset = { x: 0, y: 0, w: 0, h: 0, l: 0, t: 0 };
 
         // 윈도우 클릭 시 최상단으로
         win.addEventListener("mousedown", () => AppCore.focusWindow(win));
 
-        // 드래그 시작
+        // header 잡고 드래그 
         if (header) {
             header.addEventListener("mousedown", e => {
                 if (e.target.closest(".remote")) return;
@@ -165,7 +231,7 @@ export function initWindowControls() {
             });
         }
 
-        // 리사이즈 시작
+        // Finder 리사이즈
         handles.forEach(handle => {
             handle.addEventListener("mousedown", e => {
                 e.preventDefault();
@@ -181,18 +247,42 @@ export function initWindowControls() {
         // 마우스 이동 핸들러
         document.addEventListener("mousemove", e => {
             if (state.isDragging && !win.classList.contains("is-zoomed")) {
-                win.style.left = `${e.clientX - offset.x}px`;
-                win.style.top = `${e.clientY - offset.y}px`;
+                let moveX = e.clientX - offset.x;
+                let moveY = e.clientY - offset.y;
+
+                const minX = 0, minY = 0;
+                const maxX = window.innerWidth - win.offsetWidth;
+                const maxY = window.innerHeight - win.offsetHeight;
+
+                moveX = Math.max(minX, Math.min(maxX, moveX));
+                moveY = Math.max(minY, Math.min(maxY, moveY));
+
+                win.style.left = `${moveX}px`;
+                win.style.top = `${moveY}px`;
+
             }
 
             if (state.isResizing) {
                 let dx = e.clientX - offset.startX, dy = e.clientY - offset.startY;
                 let nw = offset.w, nh = offset.h, nl = offset.l, nt = offset.t;
 
-                if (state.handle.includes("right")) nw = offset.w + dx;
-                if (state.handle.includes("left")) { nw = offset.w - dx; nl = offset.l + dx; }
-                if (state.handle.includes("bottom")) nh = offset.h + dy;
-                if (state.handle.includes("top")) { nh = offset.h - dy; nt = offset.t + dy; }
+                if (state.handle.includes("right")) {
+                    nw = Math.min(offset.w + dx, window.innerWidth - offset.l);
+                }
+                if (state.handle.includes("left")) {
+                    let targetLeft = Math.max(0, offset.l + dx);
+                    nw = offset.w + (offset.l - targetLeft);
+                    nl = targetLeft;
+                }
+                if (state.handle.includes("bottom")) {
+                    const maxAvailableHeight = window.innerHeight - offset.t - (window.innerWidth <= 768 ? 0 : 64);
+                    nh = Math.min(offset.h + dy, maxAvailableHeight);
+                }
+                if (state.handle.includes("top")) {
+                    let targetTop = Math.max(0, offset.t + dy);
+                    nh = offset.h + (offset.t - targetTop);
+                    nt = targetTop;
+                }
 
                 if (nw > 300) { win.style.width = `${nw}px`; win.style.left = `${nl}px`; }
                 if (nh > 200) { win.style.height = `${nh}px`; win.style.top = `${nt}px`; }
@@ -206,9 +296,9 @@ export function initWindowControls() {
     });
 
     /* ============================================================
-     * UI Control Events
+     * window Control Events
      * ============================================================ */
-    
+
     // 닫기
     document.querySelectorAll(".remote .close").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -222,6 +312,9 @@ export function initWindowControls() {
     // 최소화
     document.querySelectorAll(".remote .minimize").forEach(btn => {
         btn.addEventListener("click", () => {
+            // 모바일 최소화 x
+            if (window.innerWidth <= 768) return;
+
             const win = btn.closest(".window");
             win.dataset.restoreWidth = win.style.width || win.offsetWidth + "px";
             win.dataset.restoreHeight = win.style.height || win.offsetHeight + "px";
@@ -240,9 +333,12 @@ export function initWindowControls() {
         });
     });
 
-    // 확대/축소
+    // 확대
     document.querySelectorAll(".remote .zoom").forEach(btn => {
         btn.addEventListener("click", () => {
+            // 모바일 확대 x
+            if (window.innerWidth <= 768) return;
+
             const win = btn.closest(".window");
             if (win.classList.contains("calculator") || win.classList.contains("weather")) return;
 
@@ -254,12 +350,16 @@ export function initWindowControls() {
 
                 Object.assign(win.style, { top: '0', left: '0', width: '100vw', height: 'calc(100vh - 4rem)' });
                 win.classList.add("is-zoomed");
+                win.classList.add("animating");
             } else {
                 Object.assign(win.style, {
                     top: win.dataset.prevTop, left: win.dataset.prevLeft,
                     width: win.dataset.prevWidth, height: win.dataset.prevHeight
                 });
                 win.classList.remove("is-zoomed");
+                setTimeout(() => {
+                    win.classList.remove('animating');
+                }, 100);
             }
         });
     });
@@ -280,23 +380,6 @@ export function initWindowControls() {
             if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
             else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
         });
-    }
-
-    /** 앱 실행 시 시각적 포커스 가이드 */
-    function handleInitialFocus(appName, options = {}) {
-        const win = document.querySelector(`.window.${appName}`);
-        if (!win) return;
-        setupFocusTrap(win);
-
-        if (appName === 'finder') {
-            if (!options.path) {
-                setTimeout(() => {
-                    (win.querySelector('.folder.selected') || win.querySelector('.folder'))?.focus();
-                }, 100);
-            }
-        } else {
-            setTimeout(() => win.querySelector('.close')?.focus(), 300);
-        }
     }
 
     // 빈 화면 클릭 시 포커스 해제

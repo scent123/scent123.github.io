@@ -202,6 +202,10 @@ export function initCalculator() {
         const active = document.activeElement;
         if (active && active.closest('.dock-menu')) return;
 
+        if (e.key === 'Enter' || e.key === '=' || ['+', '-', '*', '/', '%'].includes(e.key)) {
+            e.preventDefault();
+        }
+
         // 숫자
         if (e.key >= '0' && e.key <= '9') { onNumber(e.key); return; }
         if (e.key === '.') { onNumber('.'); return; }

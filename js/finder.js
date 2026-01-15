@@ -1,5 +1,5 @@
 export function initFinder() {
-
+    // finder 내부 내용을 다룰 객체
     const finderData = {
         name: "Users",
         folderImage: "./images/folder.png",
@@ -68,10 +68,11 @@ export function initFinder() {
                                 name: "Projects",
                                 folderImage: "./images/Projects.png",
                                 children: [
-                                    { name: "Ando Tadao", type: "preview", image: "./images/Ando_Page.jpg", skill: 'HTML, CSS, JavaScript, jQuery', explain: '일본의 한 건축가 ‘안도 다다오’의 작품에 대해 소개하는 사이트를 자체 제작', timeline: '2023.09.13 - 2023.12.02', link: './andotadao/index.html' },
-                                    { name: "Angelinus", type: "preview", image: "./images/angelinus.jpg", skill: 'HTML, CSS, JavaScript, jQuery', explain: '엔제리너스 카페의 홈페이지를 리뉴얼하여 제작', timeline: '2024.02.15 - 2024.03.10', link: './angelinus/index.html' },
-                                    { name: "Musign", type: "preview", image: "./images/musign.jpg", skill: 'HTML, CSS, JavaScript', explain: '인터넷 강의를 들으며 제작한 반응형 웹 뮤자인 홈페이지 제작', timeline: '2023-12.17 - 2024.01.22', link: './musign/index.html' },
-                                    { name: "Monami", type: "preview", image: "./images/monami.jpg", skill: 'HTML, CSS, JavaScript', explain: '모나미 홈페이지를 리뉴얼하여 제작', timeline: '2025.07.22 - 2025.09.13', link: './monami/index.html' },
+                                    { name: "Ando Tadao", type: "preview", image: "./images/projects/Ando_Page.jpg", skill: 'HTML, CSS, JavaScript, jQuery', explain: '1920x1080 고정형 웹으로 제작된 일본의 한 건축가 ‘안도 다다오’의 작품에 대해 소개하는 사이트를 자체 제작', timeline: '2023.09.13 - 2023.12.02', link: './andotadao/index.html' },
+                                    { name: "Angelinus", type: "preview", image: "./images/projects/angelinus.jpg", skill: 'HTML, CSS, JavaScript, jQuery', explain: '1920x1080 고정형 웹으로 엔제리너스 카페의 홈페이지를 리뉴얼하여 제작', timeline: '2024.02.15 - 2024.03.10', link: './angelinus/index.html' },
+                                    { name: "Musign", type: "preview", image: "./images/projects/musign.jpg", skill: 'HTML, CSS, JavaScript', explain: '인터넷 강의를 들으며 제작한 반응형 웹 뮤자인 홈페이지 제작', timeline: '2023-12.17 - 2024.01.22', link: './musign/index.html' },
+                                    { name: "Monami", type: "preview", image: "./images/projects/monami.jpg", skill: 'HTML, CSS, JavaScript', explain: '1920x1080 고정형 웹으로 모나미 홈페이지를 리뉴얼하여 제작', timeline: '2025.07.22 - 2025.09.13', link: './monami/index.html' },
+                                    { name: "수박게임", type: "preview", image: "./images/projects/suikaGame.jpg", skill: 'HTML, CSS, JavaScript', explain: '"명조"라는 게임의 캐릭터 디자인을 이용한 수박게임', timeline: '2025.12.26 - ing', link: 'https://scent123.github.io/suikaGame/' },
                                 ],
                             },
 
@@ -105,24 +106,17 @@ export function initFinder() {
     const content = finderWindow.querySelector('.content');
     const finderClose = finderWindow.querySelector('.close');
 
+    // finder 종료 버튼
     if (finderClose) {
         finderClose.addEventListener('click', () => {
-            finderWindow.classList.remove('active');
-            content.innerHTML = '';
-        });
+            if (window.WindowControls?.closeApp) {
+                window.WindowControls.closeApp('finder');
+            } else {
+                finderWindow.classList.remove('active');
+                content.innerHTML = '';
+            }
+        })
     }
-
-    // function callOpenApp(appName, path = null) {
-    //     if (window.WindowControls?.openApp) {
-    //         window.WindowControls.openApp(appName, { path });
-    //     }
-    // }
-
-    // function callActivateDock(appName) {
-    //     if (window.WindowControls?.setActiveDockIcon) {
-    //         window.WindowControls.setActiveDockIcon(appName);
-    //     }
-    // }
 
     /* Finder tree 탐색 */
     function getNodeByPath(path) {
@@ -140,10 +134,11 @@ export function initFinder() {
      * Column
      * ============================================================ */
     function openPath(path = []) {
-
+        // finder content 선택에 따라 변경될 header의 이름과 아이콘
         const folderNameEl = finderWindow.querySelector('.folder-name');
         const folderIconEl = finderWindow.querySelector('.folder-icon');
 
+        // 선택한 path가 없거나, 정확하지 않아 length가 0인경우 최상위 디렉토리인 Root가 표시되게 함.
         if (!path || path.length === 0) {
             content.innerHTML = '';
             renderColumn([finderData], 0, null, []);
@@ -151,7 +146,7 @@ export function initFinder() {
             folderIconEl.style.backgroundImage = `url(./images/folder.png)`;
             return;
         }
-
+        // 현재 경로를 path에 저장함.
         finderWindow.currentPath = path;
 
         const currentNode = getNodeByPath(path);
@@ -189,21 +184,14 @@ export function initFinder() {
             content.scrollLeft = content.scrollWidth;
         }, 0);
 
-        // const firstItem = content.querySelector('.folder');
-
+        
         setTimeout(() => {
             const columns = content.querySelectorAll('.finder-columns');
             const lastColumn = columns[columns.length - 1];
 
             if (lastColumn) {
                 const firstItem = lastColumn.querySelector('.folder');
-                if (firstItem) firstItem.focus();
-            }
-
-            const preview = content.querySelector('.finder-preview');
-            if (preview) {
-                const previewFocusTarget = preview.querySelector('.preview-image-btn, preview-closeBtn');
-                if (previewFocusTarget) previewFocusTarget.focus();
+                if (firstItem) firstItem.focus({ preventScroll: true });
             }
 
             content.scrollLeft = content.scrollWidth;
@@ -374,14 +362,15 @@ export function initFinder() {
             if (e.key === ' ' || e.code === 'Space') {
                 e.preventDefault();
 
-                const existingOverlay = document.querySelector('.quicklook-overlay');
-                if (existingOverlay) {
-                    const closeBtn = existingOverlay.querySelector('.quicklook-close');
+                if (currentQuickLookOverlay) {
+                    const closeBtn = currentQuickLookOverlay.querySelector('.quicklook-close');
                     if (closeBtn) closeBtn.click();
-                    else existingOverlay.click();
                     return;
                 }
-                img.click();
+
+                if (img) {
+                    openQuickLook(img);
+                }
             }
         });
 
@@ -521,108 +510,142 @@ export function initFinder() {
     * Quick Look 이미지 확대 기능
     * ============================================================ */
     let currentQuickLookOverlay = null;
+    let lastFocusedElement = null;
 
-    document.addEventListener("click", (e) => {
-        const img = e.target.closest('.preview-image');
+    function openQuickLook(img) {
         if (!img) return;
 
-        // profile, tools는 확대 방지
-        if (img.dataset.name === 'Profile' || img.dataset.parent === 'Tools') return;
+        if (currentQuickLookOverlay) {
+            currentQuickLookOverlay.querySelector('.quicklook-close').click();
+            return;
+        }
 
+        lastFocusedElement = document.activeElement;
+
+
+        const overlay = document.createElement('div');
+        overlay.classList.add('quicklook-overlay');
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        overlay.setAttribute('aria-modal', `${img.dataset.name} Preview`);
+
+        currentQuickLookOverlay = overlay;
+
+        const container = document.createElement('div');
+        container.classList.add('quicklook-container');
+
+        const bigImg = document.createElement('img');
+        bigImg.src = img.src;
+
+        // Mobile Device
         const isMobile = window.innerWidth <= 768;
-
-        // Quick Look
-        function openQuickLook(img) {
-            if (currentQuickLookOverlay) {
-                currentQuickLookOverlay.querySelector('.quicklook-close').click();
-                return;
-            }
-            const overlay = document.createElement("div");
-            overlay.className = "quicklook-overlay";
-
-            const container = document.createElement("div");
-            container.className = "quicklook-container";
-
-            const bigImg = document.createElement("img");
-            bigImg.src = img.src;
-
-            // mobile device
-            if (isMobile) {
-                container.classList.add('mobile');
-
-                container.appendChild(bigImg);
-                overlay.appendChild(container);
-                document.body.appendChild(overlay);
-
-                overlay.addEventListener('click', () => {
-                    overlay.remove();
-                });
-                return;
-            }
-
-            // Desktop device
-            const rect = img.getBoundingClientRect();
-            const scrollTop = window.scrollY;
-            const scrollLeft = window.scrollX;
-
-            const header = document.createElement("div");
-            header.className = "quicklook-header";
-            header.innerHTML = `
-                <span class="quicklook-close">✕</span>
-                <span class="quicklook-name">${img.dataset.name}</span>
-            `;
-
-            container.appendChild(header);
+        if (isMobile) {
             container.appendChild(bigImg);
             overlay.appendChild(container);
             document.body.appendChild(overlay);
 
-            const startX = rect.left + rect.width / 2 + scrollLeft;
-            const startY = rect.top + rect.height / 2 + scrollTop;
+            container.style.opacity = '0';
+            container.style.transform = 'scale(1.1)';
+            container.style.transition = 'all 0.5s ease';
 
-            container.style.position = "absolute";
-            container.style.left = startX + "px";
-            container.style.top = startY + "px";
-            container.style.transform = "translate(-50%, -50%) scale(0.1)";
-            container.style.transition = "transform 0.25s ease, left 0.25s ease, top 0.25s ease";
+            requestAnimationFrame(() => {
+                container.style.opacity = '1';
+                container.style.transform = 'scale(1)';
+            })
+
+            overlay.addEventListener('click', () => {
+                container.style.opacity = '0';
+                container.style.transform = 'scale(1.1)';
+
+                setTimeout(() => {
+                    overlay.remove();
+                    currentQuickLookOverlay = null;
+                    if (lastFocusedElement) lastFocusedElement.focus();
+                }, 200);
+            });
+
+            currentQuickLookOverlay = overlay;
+            return;
+        }
+
+        // Animation
+        const rect = img.getBoundingClientRect();
+        const startX = rect.left + rect.width / 2;
+        const startY = rect.top + rect.height / 2;
+
+        container.style.transition = 'none';
+        container.style.left = `${startX}px`;
+        container.style.top = `${startY}px`;
+        container.style.transform = "translate(-50%, -50%) scale(0.1)";
+        container.style.opacity = '0';
+
+        const header = document.createElement('div');
+        header.classList.add('quicklook-header');
+        header.innerHTML = `
+            <button class="quicklook-close" aria-label="Close QuickLook">x</button>
+            <span class="quicklook-name">${img.dataset.name}</span>
+        `;
+
+        container.appendChild(header);
+        container.appendChild(bigImg);
+        overlay.appendChild(container);
+        document.body.appendChild(overlay);
+
+        requestAnimationFrame(() => {
+            container.style.transition = 'all 0.25s ease-out';
 
             requestAnimationFrame(() => {
                 container.style.left = "50%";
                 container.style.top = "50%";
                 container.style.transform = "translate(-50%, -50%) scale(1)";
                 container.style.opacity = '1';
+
+                // move focus -> close button
+                const closeBtn = header.querySelector('.quicklook-close');
+                if (closeBtn) closeBtn.focus();
             });
+        });
 
-            function closeQuickLook() {
-                container.style.left = startX + "px";
-                container.style.top = startY + "px";
-                container.style.transform = "translate(-50%, -50%) scale(0.1)";
+        overlay.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
 
-                setTimeout(() => {
-                    overlay.remove();
-                    currentQuickLookOverlay = null;
-                }, 250);
+                const closeBtn = header.querySelector('.quicklook-close');
+                if (closeBtn) closeBtn.focus();
             }
+            if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();                closeQuickLook();
+            }
+        });
 
-            overlay.addEventListener("click", (e) => {
-                if (
-                    e.target.classList.contains("quicklook-close") ||
-                    e.target.classList.contains("quicklook-overlay")
-                ) {
-                    closeQuickLook();
-                }
-            });
+        function closeQuickLook() {
+            container.style.left = startX + 'px';
+            container.style.top = startY + 'px';
+            container.style.transform = 'translate(-50%, -50%) scale(0.1)';
+            container.style.opacity = '0';
 
-            document.addEventListener("keydown", function escClose(ev) {
-                if (ev.key === "Escape") {
-                    closeQuickLook();
-                    document.removeEventListener("keydown", escClose);
-                }
-            });
+            setTimeout(() => {
+                overlay.remove();
+                currentQuickLookOverlay = null;
+
+                if (lastFocusedElement) lastFocusedElement.focus();
+            }, 250);
         }
 
+        // closeButton & event
+        const closeBtn = header.querySelector('.quicklook-close');
+        if (closeBtn) closeBtn.addEventListener('click', closeQuickLook);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeQuickLook();
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        const img = e.target.closest('.preview-image');
+        if (!img) return;
+        // if (img.dataset.name === 'Profile' || img.dataset.parent === 'Tools') return;
         openQuickLook(img);
-    },);
+    });
 
     window.Finder = { openPath, finderData, getNodeByPath };
     window.dispatchEvent(new Event('FinderReady'));

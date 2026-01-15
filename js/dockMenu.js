@@ -457,18 +457,55 @@ export function initDockMenu() {
     dockStart.addEventListener("click", (e) => {
         e.stopPropagation();
 
-        const willOpen = !dockMenu.classList.contains("active");
-        dockMenu.classList.toggle("active");
+        const isMobile = window.innerWidth <= 768;
+        const isActive = dockMenu.classList.contains('active');
 
-        if (willOpen) {
-            renderRecent();
-            const el = searchInput?.tagName === "INPUT"
-                ? searchInput
-                : searchInput?.querySelector("input");
-            if (el) setTimeout(() => el.focus(), 60);
-        } else {
-            closeDockMenu();
+        if (isMobile) {
+            dockMenu.style.transition = 'none';
+
+            if (isActive) {
+                dockMenu.classList.remove('active');
+                dockMenu.setAttribute('aria-expanded', 'false');
+            }
+            else {
+                renderRecent();
+                dockMenu.classList.add('active');
+                dockStart.setAttribute('aria-expanded', 'true');
+                if (searchInput) {
+                    const inputEl = searchInput.tagName === 'INPUT' ? searchInput : searchInput.querySelector('input');
+                    if (inputEl) setTimeout(() => inputEl.focus(), 10);
+                }
+            }
+
+            setTimeout(() => { dockMenu.style.transition = ''; }, 0);
         }
+        else {
+            if (isActive) {
+                closeDockMenu();
+            }
+            else {
+                dockMenu.classList.add('active');
+                renderRecent();
+                    const inputEl = searchInput.tagName === 'INPUT' ? searchInput : searchInput.querySelector('input');
+                    if (inputEl) setTimeout(() => inputEl.focus(), 10);
+            }
+        }
+
+
+        /*         e.stopPropagation();
+        
+                const willOpen = !dockMenu.classList.contains("active");
+                dockMenu.classList.toggle("active");
+        
+                if (willOpen) {
+                    renderRecent();
+                    const el = searchInput?.tagName === "INPUT"
+                        ? searchInput
+                        : searchInput?.querySelector("input");
+                    if (el) setTimeout(() => el.focus(), 60);
+                } else {
+                    closeDockMenu();
+                } */
     });
 
     /* ============================================================
